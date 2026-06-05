@@ -17,7 +17,7 @@ const fraudLabel = "fraud"
 
 // defaultProbeCount is the number of IVF partitions probed when no explicit
 // probe count is given and IVF_PROBE_COUNT is not set.
-const defaultProbeCount = 8
+const defaultProbeCount = 4
 
 // IVFSearcher performs approximate nearest-neighbor search using an
 // Inverted File Index.
