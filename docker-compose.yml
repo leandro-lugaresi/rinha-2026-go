@@ -17,11 +17,11 @@ services:
     build:
       context: .
       dockerfile: Dockerfile
-      platforms:
-        - linux/amd64
     environment:
       PORT: "9999"
       RINHA_INDEX_PATH: /app/references.ivf
+      RINHA_NORMALIZATION_PATH: /app/normalization.json
+      RINHA_MCC_RISK_PATH: /app/mcc_risk.json
     deploy:
       resources:
         limits:
@@ -34,11 +34,11 @@ services:
     build:
       context: .
       dockerfile: Dockerfile
-      platforms:
-        - linux/amd64
     environment:
       PORT: "9999"
       RINHA_INDEX_PATH: /app/references.ivf
+      RINHA_NORMALIZATION_PATH: /app/normalization.json
+      RINHA_MCC_RISK_PATH: /app/mcc_risk.json
     deploy:
       resources:
         limits:
