@@ -6,12 +6,17 @@ import (
 	"fmt"
 	"log"
 	"net/http"
+	"sync"
 
 	"github.com/leandro-lugaresi/rinha-2026-go/internal/reference"
 	"github.com/leandro-lugaresi/rinha-2026-go/internal/scoring"
 	"github.com/leandro-lugaresi/rinha-2026-go/internal/search"
 	"github.com/leandro-lugaresi/rinha-2026-go/internal/vectorize"
 )
+
+var payloadPool = sync.Pool{
+	New: func() interface{} { return &vectorize.Payload{} },
+}
 
 // Server holds the IVF searcher and readiness state for the fraud-score API.
 type Server struct {
@@ -75,14 +80,16 @@ func (s *Server) ReadyHandler(w http.ResponseWriter, r *http.Request) {
 func (s *Server) FraudScoreHandler(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 
-	var payload vectorize.Payload
-	if err := json.NewDecoder(r.Body).Decode(&payload); err != nil {
+	payload := payloadPool.Get().(*vectorize.Payload)
+	defer payloadPool.Put(payload)
+	*payload = vectorize.Payload{}
+	if err := json.NewDecoder(r.Body).Decode(payload); err != nil {
 		log.Printf("error decoding payload: %v", err)
 		writeDefaultResponse(w)
 		return
 	}
 
-	vec, err := vectorize.Vectorize(payload)
+	vec, err := vectorize.Vectorize(*payload)
 	if err != nil {
 		log.Printf("error vectorizing payload: %v", err)
 		writeDefaultResponse(w)
