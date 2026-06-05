@@ -3,6 +3,12 @@
 Entry for [Rinha de Backend 2026](https://github.com/zanfranceschi/rinha-de-backend-2026).  
 A Go-based fraud detection API using vector search over a labeled reference dataset.
 
+## AI-assisted development
+
+This project was built with AI assistance using OpenCode. The main planning
+and implementation session is available at
+[opncd.ai/share/6SPji5A](https://opncd.ai/share/6SPji5A).
+
 ## Endpoints
 
 - `GET /ready` — returns `2xx` when the API is ready.
