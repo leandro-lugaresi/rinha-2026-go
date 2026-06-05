@@ -13,6 +13,7 @@ import (
 	"os"
 	"runtime"
 	"sync"
+	"time"
 )
 
 const (
@@ -314,11 +315,8 @@ func assignParallel(vectors []float32, numVectors, k int, centroids [][dimCount]
 				bestDist := float32(math.MaxFloat32)
 				bestC := 0
 				for c := 0; c < k; c++ {
-					var dot float32
-					cent := centroids[c]
-					for j := 0; j < dimCount; j++ {
-						dot += vectors[base+j] * cent[j]
-					}
+					cent := &centroids[c]
+					dot := dot14(vectors, base, cent)
 					dist := centroidSqNorms[c] - 2*dot
 					if dist < bestDist {
 						bestDist = dist
@@ -334,10 +332,15 @@ func assignParallel(vectors []float32, numVectors, k int, centroids [][dimCount]
 	}
 }
 
-// assignNearest is like assignParallel but single-threaded and returns
-// a new slice. Used after k-means for final assignment.
+// assignNearest returns the nearest centroid for each vector.
 func assignNearest(vectors []float32, numVectors int, centroids [][dimCount]float32) []int {
 	k := len(centroids)
+	out := make([]int, numVectors)
+	if numVectors >= 4096 {
+		assignParallel(vectors, numVectors, k, centroids, out)
+		return out
+	}
+
 	centroidSqNorms := make([]float32, k)
 	for c := 0; c < k; c++ {
 		var s float32
@@ -347,17 +350,13 @@ func assignNearest(vectors []float32, numVectors int, centroids [][dimCount]floa
 		centroidSqNorms[c] = s
 	}
 
-	out := make([]int, numVectors)
 	for i := 0; i < numVectors; i++ {
 		base := i * dimCount
 		bestDist := float32(math.MaxFloat32)
 		bestC := 0
 		for c := 0; c < k; c++ {
-			var dot float32
-			cent := centroids[c]
-			for j := 0; j < dimCount; j++ {
-				dot += vectors[base+j] * cent[j]
-			}
+			cent := &centroids[c]
+			dot := dot14(vectors, base, cent)
 			dist := centroidSqNorms[c] - 2*dot
 			if dist < bestDist {
 				bestDist = dist
@@ -367,6 +366,23 @@ func assignNearest(vectors []float32, numVectors int, centroids [][dimCount]floa
 		out[i] = bestC
 	}
 	return out
+}
+
+func dot14(vectors []float32, base int, cent *[dimCount]float32) float32 {
+	return vectors[base]*cent[0] +
+		vectors[base+1]*cent[1] +
+		vectors[base+2]*cent[2] +
+		vectors[base+3]*cent[3] +
+		vectors[base+4]*cent[4] +
+		vectors[base+5]*cent[5] +
+		vectors[base+6]*cent[6] +
+		vectors[base+7]*cent[7] +
+		vectors[base+8]*cent[8] +
+		vectors[base+9]*cent[9] +
+		vectors[base+10]*cent[10] +
+		vectors[base+11]*cent[11] +
+		vectors[base+12]*cent[12] +
+		vectors[base+13]*cent[13]
 }
 
 // writeIndexFile writes the binary IVF index to path.
@@ -445,33 +461,40 @@ func writeIndexFile(path string, vectors []float32, labels []uint8, assignments 
 // returned function stops monitoring and returns the final peak.
 func monitorRSS() func() uint64 {
 	var peak uint64
+	var mu sync.Mutex
 	var once sync.Once
 	done := make(chan struct{})
 	var m runtime.MemStats
 
 	go func() {
+		ticker := time.NewTicker(250 * time.Millisecond)
+		defer ticker.Stop()
 		for {
 			select {
 			case <-done:
 				return
-			default:
+			case <-ticker.C:
 				runtime.ReadMemStats(&m)
 				rss := m.Sys
+				mu.Lock()
 				if rss > peak {
 					peak = rss
 				}
+				mu.Unlock()
 			}
-			runtime.Gosched()
 		}
 	}()
 
 	return func() uint64 {
 		runtime.ReadMemStats(&m)
+		mu.Lock()
 		if m.Sys > peak {
 			peak = m.Sys
 		}
+		currentPeak := peak
+		mu.Unlock()
 		once.Do(func() { close(done) })
-		return peak
+		return currentPeak
 	}
 }
 
