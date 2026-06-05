@@ -65,11 +65,11 @@ func writeMiniIVF(t *testing.T, refs []reference.Reference, centroids [][14]floa
 
 	// Header.
 	f.Write([]byte("RVI1"))
-	writeLE(uint32(1))                 // version
-	writeLE(uint32(numParts))          // partitions
-	writeLE(uint32(len(refs)))         // num vectors
-	writeLE(uint32(referenceLen))      // dimensions
-	writeLE(uint32(1))                 // encoding = uint8
+	writeLE(uint32(1))            // version
+	writeLE(uint32(numParts))     // partitions
+	writeLE(uint32(len(refs)))    // num vectors
+	writeLE(uint32(referenceLen)) // dimensions
+	writeLE(uint32(1))            // encoding = uint8
 
 	// Partition metadata.
 	for p := 0; p < numParts; p++ {

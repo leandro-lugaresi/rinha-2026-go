@@ -17,8 +17,8 @@ const indexFilePath = "../../var/references.ivf"
 func randomQuery(rng *rand.Rand) [14]float64 {
 	var q [14]float64
 	for i := 0; i < 14; i++ {
-		switch {
-		case i == 5 || i == 6:
+		switch i {
+		case 5, 6:
 			q[i] = rng.Float64()*2 - 1
 		default:
 			q[i] = rng.Float64()

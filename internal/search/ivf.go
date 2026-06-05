@@ -15,6 +15,8 @@ import (
 // ivfDimCount is the fixed dimensionality of the vector space.
 const ivfDimCount = 14
 
+const fraudLabel = "fraud"
+
 // defaultProbeCount is the number of IVF partitions probed when no explicit
 // probe count is given and IVF_PROBE_COUNT is not set.
 const defaultProbeCount = 32
@@ -77,7 +79,11 @@ func (h maxHeap) Less(i, j int) bool { return h.items[i].dist > h.items[j].dist 
 func (h maxHeap) Swap(i, j int)      { h.items[i], h.items[j] = h.items[j], h.items[i] }
 
 func (h *maxHeap) Push(x any) {
-	h.items = append(h.items, x.(neighbor))
+	n, ok := x.(neighbor)
+	if !ok {
+		panic(fmt.Sprintf("maxHeap expected neighbor, got %T", x))
+	}
+	h.items = append(h.items, n)
 }
 
 func (h *maxHeap) Pop() any {
@@ -137,7 +143,7 @@ func (s *IVFSearcher) Search(query [14]float64, k int) ([]reference.Reference, e
 	})
 
 	// 3–5. Scan partitions, keep top-K in a max-heap.
-	h := &maxHeap{}
+	h := &maxHeap{items: nil}
 	heap.Init(h)
 
 	for probe := 0; probe < nParts; probe++ {
@@ -147,7 +153,7 @@ func (s *IVFSearcher) Search(query [14]float64, k int) ([]reference.Reference, e
 		// the 0-based vector index.
 		pid := p.idx
 		byteOff := s.index.PartitionOffset(pid)
-		vecStart := uint32(byteOff / ivfDimCount)
+		vecStart := byteOff / ivfDimCount
 		vecCount := s.index.PartitionVectorCount(pid)
 
 		for i := uint32(0); i < vecCount; i++ {
@@ -222,9 +228,7 @@ func dequantizeVector(v [14]uint8) [14]float64 {
 // labelStr maps the stored uint8 label (0=legit, 1=fraud) to a string.
 func labelStr(l uint8) string {
 	if l == 1 {
-		return "fraud"
+		return fraudLabel
 	}
 	return "legit"
 }
-
-
