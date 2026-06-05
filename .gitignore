@@ -1,0 +1,30 @@
+# Binaries
+bin/
+/indexer
+*.exe
+*.dll
+*.so
+*.dylib
+
+# Test binary
+*.test
+
+# Output of go coverage
+*.out
+
+# Project directories
+var/
+*.log
+
+# Sisyphus evidence
+.sisyphus/evidence/
+
+# Vendor
+vendor/
+
+# IDE
+.idea/
+.vscode/
+*.swp
+*.swo
+*~
