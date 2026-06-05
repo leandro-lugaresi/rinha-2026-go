@@ -1,0 +1,88 @@
+name: Publish submission
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - main
+
+permissions:
+  contents: write
+  packages: write
+
+concurrency:
+  group: publish-submission
+  cancel-in-progress: true
+
+env:
+  REGISTRY: ghcr.io
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    timeout-minutes: 90
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set image names
+        run: |
+          repo="${GITHUB_REPOSITORY,,}"
+          image="${REGISTRY}/${repo}"
+          echo "IMAGE=${image}" >> "${GITHUB_ENV}"
+          echo "IMAGE_SHA=${image}:${GITHUB_SHA}" >> "${GITHUB_ENV}"
+          echo "IMAGE_LATEST=${image}:latest" >> "${GITHUB_ENV}"
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Log in to GHCR
+        uses: docker/login-action@v3
+        with:
+          registry: ${{ env.REGISTRY }}
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Build and push API image
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          file: ./Dockerfile
+          platforms: linux/amd64
+          push: true
+          tags: |
+            ${{ env.IMAGE_SHA }}
+            ${{ env.IMAGE_LATEST }}
+          labels: |
+            org.opencontainers.image.source=https://github.com/${{ github.repository }}
+            org.opencontainers.image.revision=${{ github.sha }}
+
+      - name: Generate submission files
+        run: |
+          rm -rf submission
+          mkdir -p submission
+          cp info.json submission/info.json
+          cp haproxy/haproxy.cfg submission/haproxy.cfg
+          cp docker-compose-submission.yml submission/docker-compose.yml
+          sed -E -i.bak "s|ghcr\.io/leandro-lugaresi/rinha-2026-go:[^[:space:]]+|ghcr.io/leandro-lugaresi/rinha-2026-go:${GITHUB_SHA}|g" submission/docker-compose.yml
+          rm submission/docker-compose.yml.bak
+
+      - name: Validate generated submission compose
+        run: docker compose -f submission/docker-compose.yml config
+
+      - name: Update submission branch
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          workdir="$(mktemp -d)"
+          cp -R submission/. "${workdir}/"
+          cd "${workdir}"
+          git init
+          git checkout -b submission
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add docker-compose.yml haproxy.cfg info.json
+          git commit -m "chore: update submission files"
+          git remote add origin "https://x-access-token:${GITHUB_TOKEN}@github.com/${GITHUB_REPOSITORY}.git"
+          git push --force origin submission

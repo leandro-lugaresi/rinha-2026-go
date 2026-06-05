@@ -1,0 +1,48 @@
+services:
+  haproxy:
+    image: haproxy:2.9-alpine
+    ports:
+      - "9999:9999"
+    volumes:
+      - ./haproxy.cfg:/usr/local/etc/haproxy/haproxy.cfg:ro
+    deploy:
+      resources:
+        limits:
+          cpus: "0.10"
+          memory: "20M"
+    networks:
+      - backend
+
+  api01:
+    image: ghcr.io/leandro-lugaresi/rinha-2026-go:latest
+    environment:
+      PORT: "9999"
+      RINHA_INDEX_PATH: /app/references.ivf
+      RINHA_NORMALIZATION_PATH: /app/normalization.json
+      RINHA_MCC_RISK_PATH: /app/mcc_risk.json
+    deploy:
+      resources:
+        limits:
+          cpus: "0.45"
+          memory: "160M"
+    networks:
+      - backend
+
+  api02:
+    image: ghcr.io/leandro-lugaresi/rinha-2026-go:latest
+    environment:
+      PORT: "9999"
+      RINHA_INDEX_PATH: /app/references.ivf
+      RINHA_NORMALIZATION_PATH: /app/normalization.json
+      RINHA_MCC_RISK_PATH: /app/mcc_risk.json
+    deploy:
+      resources:
+        limits:
+          cpus: "0.45"
+          memory: "160M"
+    networks:
+      - backend
+
+networks:
+  backend:
+    driver: bridge
