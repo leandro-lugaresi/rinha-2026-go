@@ -2,8 +2,21 @@ package vectorize
 
 import (
 	"math"
+	"os"
 	"testing"
 )
+
+const (
+	testNormalizationPath = "../../.context/rinha-de-backend-2026/resources/normalization.json"
+	testMCCRiskPath       = "../../.context/rinha-de-backend-2026/resources/mcc_risk.json"
+)
+
+func TestMain(m *testing.M) {
+	if err := LoadResources(testNormalizationPath, testMCCRiskPath); err != nil {
+		panic(err)
+	}
+	os.Exit(m.Run())
+}
 
 // floatNear checks that got is within ±tolerance of want.
 func floatNear(t *testing.T, got, want, tolerance float64) {
