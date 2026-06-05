@@ -1,4 +1,4 @@
-.PHONY: test bench build run docker-build smoke clean fmt vet measure-memory profile-cpu profile-mem
+.PHONY: test bench build run docker-build smoke clean fmt vet lint measure-memory profile-cpu profile-mem
 
 # ─── Metadata ────────────────────────────────────────────────
 APP      := rinha-2026-go
@@ -9,7 +9,7 @@ EVIDENCE := .sisyphus/evidence
 NOTEPAD  := .sisyphus/notepads/rinha-2026-go-backend
 
 # ─── Testing ──────────────────────────────────────────────────
-test: fmt vet
+test: fmt vet lint
 	$(GO) test ./... -count=1 -race
 
 # Standard Go test benchmarks (table-driven, -benchmem)
@@ -42,6 +42,9 @@ fmt:
 
 vet:
 	$(GO) vet ./...
+
+lint:
+	golangci-lint run
 
 # ─── Build ────────────────────────────────────────────────────
 build: $(BINDIR)/api $(BINDIR)/indexer $(BINDIR)/bench
