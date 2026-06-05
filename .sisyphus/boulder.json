@@ -1,0 +1,223 @@
+{
+  "schema_version": 2,
+  "active_work_id": "rinha-2026-go-backend-fcab1f24",
+  "works": {
+    "rinha-2026-go-backend-fcab1f24": {
+      "work_id": "rinha-2026-go-backend-fcab1f24",
+      "active_plan": "/Users/leandro/dev/rinha-2026-go/.sisyphus/plans/rinha-2026-go-backend.md",
+      "plan_name": "rinha-2026-go-backend",
+      "status": "completed",
+      "started_at": "2026-06-05T17:57:39.474Z",
+      "updated_at": "2026-06-05T19:40:47.361Z",
+      "session_ids": [
+        "ses_167a6b7f9ffehQdngO6SPji5AC"
+      ],
+      "session_origins": {
+        "ses_167a6b7f9ffehQdngO6SPji5AC": "direct"
+      },
+      "agent": "atlas",
+      "task_sessions": {
+        "todo:1": {
+          "task_key": "todo:1",
+          "task_label": "1",
+          "task_title": "Create docs/ADR foundation",
+          "session_id": "ses_167105548ffezFlgwys3rHJe0X",
+          "agent": "Sisyphus-Junior",
+          "category": "writing",
+          "updated_at": "2026-06-05T18:02:44.068Z",
+          "started_at": "2026-06-05T18:02:21.248Z",
+          "status": "completed",
+          "ended_at": "2026-06-05T18:02:44.067Z",
+          "elapsed_ms": 22819
+        },
+        "todo:3": {
+          "task_key": "todo:3",
+          "task_label": "3",
+          "task_title": "TDD vectorization and scoring rules",
+          "session_id": "ses_1670c13a2ffeMqGWJuuXz21wsI",
+          "agent": "Sisyphus-Junior",
+          "category": "unspecified-high",
+          "updated_at": "2026-06-05T18:08:47.769Z",
+          "started_at": "2026-06-05T18:08:28.675Z",
+          "status": "completed",
+          "ended_at": "2026-06-05T18:08:47.769Z",
+          "elapsed_ms": 19094
+        },
+        "todo:6": {
+          "task_key": "todo:6",
+          "task_label": "6",
+          "task_title": "Implement IVF searcher and recall benchmark",
+          "session_id": "ses_166e4f2feffelDuLociaG3vQIO",
+          "agent": "Sisyphus-Junior",
+          "category": "deep",
+          "updated_at": "2026-06-05T18:48:36.448Z",
+          "started_at": "2026-06-05T18:48:29.461Z",
+          "status": "completed",
+          "ended_at": "2026-06-05T18:48:36.447Z",
+          "elapsed_ms": 6986
+        },
+        "todo:7": {
+          "task_key": "todo:7",
+          "task_label": "7",
+          "task_title": "Implement net/http API server",
+          "session_id": "ses_166e2304cffegiNVZ3kfd48oyH",
+          "agent": "Sisyphus-Junior",
+          "category": "unspecified-high",
+          "updated_at": "2026-06-05T18:54:46.643Z",
+          "started_at": "2026-06-05T18:54:40.472Z",
+          "status": "completed",
+          "ended_at": "2026-06-05T18:54:46.643Z",
+          "elapsed_ms": 6171
+        },
+        "todo:8": {
+          "task_key": "todo:8",
+          "task_label": "8",
+          "task_title": "Add Dockerfile, HAProxy, and compose topology",
+          "session_id": "ses_166dc780bffetZ09y07qMNBeYA",
+          "agent": "Sisyphus-Junior",
+          "category": "unspecified-high",
+          "updated_at": "2026-06-05T19:01:35.862Z",
+          "started_at": "2026-06-05T18:58:06.319Z",
+          "status": "completed",
+          "ended_at": "2026-06-05T19:01:35.862Z",
+          "elapsed_ms": 209543
+        },
+        "todo:10": {
+          "task_key": "todo:10",
+          "task_label": "10",
+          "task_title": "Run local integration, smoke, and submission checks",
+          "session_id": "ses_166d5f834ffeJsC3vu3l5xNZLT",
+          "agent": "Sisyphus-Junior",
+          "category": "unspecified-high",
+          "updated_at": "2026-06-05T19:10:01.368Z",
+          "started_at": "2026-06-05T19:09:47.057Z",
+          "status": "completed",
+          "ended_at": "2026-06-05T19:10:01.368Z",
+          "elapsed_ms": 14311
+        },
+        "final-wave:f1": {
+          "task_key": "final-wave:f1",
+          "task_label": "F1",
+          "task_title": "Plan Compliance Audit — oracle",
+          "session_id": "ses_166b8c38fffeR9ceSvPxtPBrq7",
+          "agent": "oracle",
+          "category": "",
+          "started_at": "2026-06-05T19:16:53.384Z",
+          "status": "completed",
+          "updated_at": "2026-06-05T19:40:17.502Z",
+          "ended_at": "2026-06-05T19:40:17.502Z",
+          "elapsed_ms": 1404118
+        }
+      },
+      "ended_at": "2026-06-05T19:40:47.361Z",
+      "elapsed_ms": 6187887
+    }
+  },
+  "active_plan": "/Users/leandro/dev/rinha-2026-go/.sisyphus/plans/rinha-2026-go-backend.md",
+  "started_at": "2026-06-05T17:57:39.474Z",
+  "status": "completed",
+  "updated_at": "2026-06-05T19:40:47.361Z",
+  "session_ids": [
+    "ses_167a6b7f9ffehQdngO6SPji5AC"
+  ],
+  "session_origins": {
+    "ses_167a6b7f9ffehQdngO6SPji5AC": "direct"
+  },
+  "plan_name": "rinha-2026-go-backend",
+  "task_sessions": {
+    "todo:1": {
+      "task_key": "todo:1",
+      "task_label": "1",
+      "task_title": "Create docs/ADR foundation",
+      "session_id": "ses_167105548ffezFlgwys3rHJe0X",
+      "agent": "Sisyphus-Junior",
+      "category": "writing",
+      "updated_at": "2026-06-05T18:02:44.068Z",
+      "started_at": "2026-06-05T18:02:21.248Z",
+      "status": "completed",
+      "ended_at": "2026-06-05T18:02:44.067Z",
+      "elapsed_ms": 22819
+    },
+    "todo:3": {
+      "task_key": "todo:3",
+      "task_label": "3",
+      "task_title": "TDD vectorization and scoring rules",
+      "session_id": "ses_1670c13a2ffeMqGWJuuXz21wsI",
+      "agent": "Sisyphus-Junior",
+      "category": "unspecified-high",
+      "updated_at": "2026-06-05T18:08:47.769Z",
+      "started_at": "2026-06-05T18:08:28.675Z",
+      "status": "completed",
+      "ended_at": "2026-06-05T18:08:47.769Z",
+      "elapsed_ms": 19094
+    },
+    "todo:6": {
+      "task_key": "todo:6",
+      "task_label": "6",
+      "task_title": "Implement IVF searcher and recall benchmark",
+      "session_id": "ses_166e4f2feffelDuLociaG3vQIO",
+      "agent": "Sisyphus-Junior",
+      "category": "deep",
+      "updated_at": "2026-06-05T18:48:36.448Z",
+      "started_at": "2026-06-05T18:48:29.461Z",
+      "status": "completed",
+      "ended_at": "2026-06-05T18:48:36.447Z",
+      "elapsed_ms": 6986
+    },
+    "todo:7": {
+      "task_key": "todo:7",
+      "task_label": "7",
+      "task_title": "Implement net/http API server",
+      "session_id": "ses_166e2304cffegiNVZ3kfd48oyH",
+      "agent": "Sisyphus-Junior",
+      "category": "unspecified-high",
+      "updated_at": "2026-06-05T18:54:46.643Z",
+      "started_at": "2026-06-05T18:54:40.472Z",
+      "status": "completed",
+      "ended_at": "2026-06-05T18:54:46.643Z",
+      "elapsed_ms": 6171
+    },
+    "todo:8": {
+      "task_key": "todo:8",
+      "task_label": "8",
+      "task_title": "Add Dockerfile, HAProxy, and compose topology",
+      "session_id": "ses_166dc780bffetZ09y07qMNBeYA",
+      "agent": "Sisyphus-Junior",
+      "category": "unspecified-high",
+      "updated_at": "2026-06-05T19:01:35.862Z",
+      "started_at": "2026-06-05T18:58:06.319Z",
+      "status": "completed",
+      "ended_at": "2026-06-05T19:01:35.862Z",
+      "elapsed_ms": 209543
+    },
+    "todo:10": {
+      "task_key": "todo:10",
+      "task_label": "10",
+      "task_title": "Run local integration, smoke, and submission checks",
+      "session_id": "ses_166d5f834ffeJsC3vu3l5xNZLT",
+      "agent": "Sisyphus-Junior",
+      "category": "unspecified-high",
+      "updated_at": "2026-06-05T19:10:01.368Z",
+      "started_at": "2026-06-05T19:09:47.057Z",
+      "status": "completed",
+      "ended_at": "2026-06-05T19:10:01.368Z",
+      "elapsed_ms": 14311
+    },
+    "final-wave:f1": {
+      "task_key": "final-wave:f1",
+      "task_label": "F1",
+      "task_title": "Plan Compliance Audit — oracle",
+      "session_id": "ses_166b8c38fffeR9ceSvPxtPBrq7",
+      "agent": "oracle",
+      "category": "",
+      "started_at": "2026-06-05T19:16:53.384Z",
+      "status": "completed",
+      "updated_at": "2026-06-05T19:40:17.502Z",
+      "ended_at": "2026-06-05T19:40:17.502Z",
+      "elapsed_ms": 1404118
+    }
+  },
+  "agent": "atlas",
+  "ended_at": "2026-06-05T19:40:47.361Z",
+  "elapsed_ms": 6187887
+}
