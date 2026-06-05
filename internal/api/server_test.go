@@ -12,9 +12,12 @@ import (
 
 	"github.com/leandro-lugaresi/rinha-2026-go/internal/api"
 	"github.com/leandro-lugaresi/rinha-2026-go/internal/reference"
+	"github.com/leandro-lugaresi/rinha-2026-go/internal/vectorize"
 )
 
 const fixturePath = "../../.context/rinha-de-backend-2026/resources/example-references.json"
+const normalizationPath = "../../.context/rinha-de-backend-2026/resources/normalization.json"
+const mccRiskPath = "../../.context/rinha-de-backend-2026/resources/mcc_risk.json"
 
 const referenceLen = 14
 
@@ -173,6 +176,9 @@ func writeMiniIVF(t *testing.T, refs []reference.Reference, centroids [][14]floa
 
 func newTestServer(t *testing.T) *api.Server {
 	t.Helper()
+	if err := vectorize.LoadResources(normalizationPath, mccRiskPath); err != nil {
+		t.Fatalf("LoadResources: %v", err)
+	}
 
 	refs := loadFixture(t)
 	if len(refs) < 20 {
@@ -296,4 +302,3 @@ func TestAPI_FraudScoreMalformedPayload(t *testing.T) {
 		t.Errorf("expected fraud_score=0.0 (safe default) on malformed payload, got %f", resp.FraudScore)
 	}
 }
-
