@@ -27,10 +27,12 @@ import (
 )
 
 var (
-	indexPath    = flag.String("index", "var/references.ivf", "Path to IVF index binary file")
-	queryCount   = flag.Int("n", 1000, "Number of random queries for search benchmark")
-	k            = flag.Int("k", 5, "Number of nearest neighbors to retrieve")
-	silent       = flag.Bool("q", false, "Quiet mode: only print raw numbers (for automated measurement)")
+	indexPath         = flag.String("index", "var/references.ivf", "Path to IVF index binary file")
+	normalizationPath = flag.String("normalization", "var/normalization.json", "Path to normalization.json")
+	mccRiskPath       = flag.String("mcc-risk", "var/mcc_risk.json", "Path to mcc_risk.json")
+	queryCount        = flag.Int("n", 1000, "Number of random queries for search benchmark")
+	k                 = flag.Int("k", 5, "Number of nearest neighbors to retrieve")
+	silent            = flag.Bool("q", false, "Quiet mode: only print raw numbers (for automated measurement)")
 )
 
 func main() {
@@ -40,8 +42,12 @@ func main() {
 		fmt.Fprintf(os.Stderr, "Run: go run ./cmd/indexer -input <refs.json.gz> -output %s\n", *indexPath)
 		os.Exit(1)
 	}
+	if err := vectorize.LoadResources(*normalizationPath, *mccRiskPath); err != nil {
+		fmt.Fprintf(os.Stderr, "FATAL: %v\n", err)
+		os.Exit(1)
+	}
 	logf("=== Fraud Detection Benchmark ===\n\n")
-	logf("Config: index=%s queries=%d k=%d\n", *indexPath, *queryCount, *k)
+	logf("Config: index=%s normalization=%s mcc-risk=%s queries=%d k=%d\n", *indexPath, *normalizationPath, *mccRiskPath, *queryCount, *k)
 
 	// ─── 1. Index load ───────────────────────────────────────────
 	logf("\n─── Index Load ───\n")
