@@ -1,6 +1,9 @@
 {
   "participants": ["Leandro Lugaresi"],
-  "social": ["https://github.com/leandro-lugaresi"],
+  "social": [
+    "https://github.com/leandro-lugaresi",
+    "https://www.linkedin.com/in/leandrolugaresi/"
+  ],
   "source-code-repo": "https://github.com/leandro-lugaresi/rinha-2026-go",
   "stack": ["go", "haproxy"],
   "open_to_work": true
