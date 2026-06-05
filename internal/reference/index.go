@@ -4,6 +4,7 @@ package reference
 
 import (
 	"encoding/binary"
+	"errors"
 	"fmt"
 	"math"
 	"os"
@@ -15,19 +16,19 @@ const ivfMagic = "RVI1"
 
 // Header constants defining the binary layout of an IVF index file.
 const (
-	ivfHeaderSize          = 24 // 6 × uint32
-	ivfPartitionMetaSize   = 64 // centroid(56) + offset(4) + count(4)
-	ivfDimCount            = 14
-	IVFEncodingUint8       = uint32(1)
-	ivfSentinelQuantized   = uint8(255)
+	ivfHeaderSize        = 24 // 6 × uint32
+	ivfPartitionMetaSize = 64 // centroid(56) + offset(4) + count(4)
+	ivfDimCount          = 14
+	IVFEncodingUint8     = uint32(1)
+	ivfSentinelQuantized = uint8(255)
 )
 
 // IVFIndex is a memory-mapped Inverted File Index for approximate
 // nearest-neighbor search over quantized reference vectors.
 type IVFIndex struct {
-	data   []byte          // mmap'd file contents
-	header ivfHeader       // parsed header fields
-	parts  []ivfPartMeta   // parsed partition metadata
+	data   []byte        // mmap'd file contents
+	header ivfHeader     // parsed header fields
+	parts  []ivfPartMeta // parsed partition metadata
 }
 
 // ivfHeader mirrors the on-disk header layout.
@@ -121,14 +122,23 @@ func LoadIndex(path string) (*IVFIndex, error) {
 		return nil, fmt.Errorf("mmap index: %w", err)
 	}
 
-	idx := &IVFIndex{data: data}
+	idx := &IVFIndex{
+		data: data,
+		header: ivfHeader{
+			Magic:      [4]byte{},
+			Version:    0,
+			Partitions: 0,
+			NumVectors: 0,
+			Dimensions: 0,
+			Encoding:   0,
+		},
+		parts: nil,
+	}
 	if err := idx.parseHeader(); err != nil {
-		syscall.Munmap(data)
-		return nil, err
+		return nil, errors.Join(err, syscall.Munmap(data))
 	}
 	if err := idx.parsePartitions(); err != nil {
-		syscall.Munmap(data)
-		return nil, err
+		return nil, errors.Join(err, syscall.Munmap(data))
 	}
 	return idx, nil
 }
@@ -154,11 +164,11 @@ func (idx *IVFIndex) parseHeader() error {
 	if string(h.Magic[:]) != ivfMagic {
 		return fmt.Errorf("bad magic: got %q, want %q", string(h.Magic[:]), ivfMagic)
 	}
-	h.Version    = binary.LittleEndian.Uint32(idx.data[4:8])
+	h.Version = binary.LittleEndian.Uint32(idx.data[4:8])
 	h.Partitions = binary.LittleEndian.Uint32(idx.data[8:12])
 	h.NumVectors = binary.LittleEndian.Uint32(idx.data[12:16])
 	h.Dimensions = binary.LittleEndian.Uint32(idx.data[16:20])
-	h.Encoding   = binary.LittleEndian.Uint32(idx.data[20:24])
+	h.Encoding = binary.LittleEndian.Uint32(idx.data[20:24])
 
 	if h.Version != 1 {
 		return fmt.Errorf("unsupported version: %d", h.Version)

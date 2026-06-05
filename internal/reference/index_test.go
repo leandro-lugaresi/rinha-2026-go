@@ -153,11 +153,11 @@ func writeMiniIndex(t *testing.T, numVectors, numParts int) string {
 
 	// Header.
 	f.Write([]byte("RVI1"))
-	writeLE(f, uint32(1))             // version
-	writeLE(f, uint32(numParts))      // partitions
-	writeLE(f, uint32(numVectors))    // num vectors
-	writeLE(f, uint32(14))            // dimensions
-	writeLE(f, uint32(1))             // encoding
+	writeLE(f, uint32(1))          // version
+	writeLE(f, uint32(numParts))   // partitions
+	writeLE(f, uint32(numVectors)) // num vectors
+	writeLE(f, uint32(14))         // dimensions
+	writeLE(f, uint32(1))          // encoding
 
 	// Partition metadata: compute offsets and counts.
 	counts := make([]uint32, numParts)
