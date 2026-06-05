@@ -89,16 +89,11 @@ func (s *Server) FraudScoreHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	results, err := s.searcher.Search(vec, 5)
+	labels, err := s.searcher.SearchLabels(vec, 5)
 	if err != nil {
 		log.Printf("error searching: %v", err)
 		writeDefaultResponse(w)
 		return
-	}
-
-	labels := make([]string, len(results))
-	for i, ref := range results {
-		labels[i] = ref.Label
 	}
 
 	fraudScore, approved := scoring.ComputeScore(labels)

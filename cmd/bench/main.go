@@ -81,7 +81,7 @@ func main() {
 	latencies := make([]float64, *queryCount)
 	for i := 0; i < *queryCount; i++ {
 		start := time.Now()
-		results, err := searcher.Search(queries[i], *k)
+		results, err := searcher.SearchLabels(queries[i], *k)
 		latencies[i] = float64(time.Since(start).Microseconds())
 		if err != nil {
 			fmt.Fprintf(os.Stderr, "FATAL: search %d: %v\n", i, err)
@@ -105,15 +105,12 @@ func main() {
 			fmt.Fprintf(os.Stderr, "FATAL: vectorize %d: %v\n", i, err)
 			os.Exit(1)
 		}
-		results, err := searcher.Search(vec, *k)
+		labels, err := searcher.SearchLabels(vec, *k)
 		if err != nil {
 			fmt.Fprintf(os.Stderr, "FATAL: search %d: %v\n", i, err)
 			os.Exit(1)
 		}
-		labels := make([]string, len(results))
-		for j, ref := range results {
-			labels[j] = ref.Label
-		}
+
 		scoring.ComputeScore(labels)
 		pipeLatencies[i] = float64(time.Since(start).Microseconds())
 	}

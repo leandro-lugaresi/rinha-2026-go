@@ -107,6 +107,106 @@ func (h *maxHeap) Pop() any {
 //     subsequent nearest partitions until K candidates are collected or the index
 //     is exhausted.
 //  7. Return up to K nearest references sorted by distance ascending.
+//
+// SearchLabels finds the k nearest neighbors and returns only their labels.
+// This avoids dequantizing vectors and heap-allocating interface values,
+// making it the preferred production path.
+func (s *IVFSearcher) SearchLabels(query [14]float64, k int) ([]string, error) {
+	if k <= 0 {
+		return nil, fmt.Errorf("k must be positive, got %d", k)
+	}
+	totalVectors := int(s.index.VectorCount())
+	if totalVectors == 0 {
+		return nil, fmt.Errorf("index is empty")
+	}
+
+	// 1. Quantize query for integer distance comparison against stored uint8 vectors.
+	qUint8 := reference.QuantizeVector(query)
+
+	// 2. Compute squared Euclidean distance to every centroid (float64→float32).
+	nParts := int(s.index.PartitionCount())
+	byDist := make([]centroidDist, nParts)
+	for p := 0; p < nParts; p++ {
+		c := s.index.Centroid(p)
+		var d float64
+		for j := 0; j < ivfDimCount; j++ {
+			diff := query[j] - float64(c[j])
+			d += diff * diff
+		}
+		byDist[p] = centroidDist{idx: p, dist: d}
+	}
+
+	slices.SortFunc(byDist, func(a, b centroidDist) int {
+		if a.dist < b.dist {
+			return -1
+		}
+		if a.dist > b.dist {
+			return 1
+		}
+		return 0
+	})
+
+	// 3–5. Scan partitions, keep top-K in a fixed-size sorted array.
+	type cand struct {
+		dist  uint64
+		label string
+	}
+	items := make([]cand, 0, k)
+
+	for probe := 0; probe < nParts; probe++ {
+		p := byDist[probe]
+
+		pid := p.idx
+		byteOff := s.index.PartitionOffset(pid)
+		vecStart := byteOff / ivfDimCount
+		vecCount := s.index.PartitionVectorCount(pid)
+
+		for i := uint32(0); i < vecCount; i++ {
+			vi := vecStart + i
+			vec := s.index.VectorAt(vi)
+
+			var d uint64
+			for j := 0; j < ivfDimCount; j++ {
+				diff := int64(qUint8[j]) - int64(vec[j])
+				d += uint64(diff * diff)
+			}
+
+			lbl := labelStr(s.index.LabelAt(vi))
+
+			if len(items) < k {
+				pos := len(items)
+				for pos > 0 && items[pos-1].dist > d {
+					pos--
+				}
+				items = append(items, cand{})
+				copy(items[pos+1:], items[pos:])
+				items[pos] = cand{dist: d, label: lbl}
+			} else if d < items[len(items)-1].dist {
+				pos := len(items) - 1
+				for pos > 0 && items[pos-1].dist > d {
+					pos--
+				}
+				copy(items[pos+1:], items[pos:len(items)-1])
+				items[pos] = cand{dist: d, label: lbl}
+			}
+		}
+
+		if probe+1 >= s.probeCount && len(items) >= k {
+			break
+		}
+	}
+
+	if len(items) == 0 {
+		return nil, fmt.Errorf("no candidates found in index")
+	}
+
+	labels := make([]string, len(items))
+	for i, c := range items {
+		labels[i] = c.label
+	}
+	return labels, nil
+}
+
 func (s *IVFSearcher) Search(query [14]float64, k int) ([]reference.Reference, error) {
 	if k <= 0 {
 		return nil, fmt.Errorf("k must be positive, got %d", k)

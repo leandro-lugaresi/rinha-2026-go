@@ -195,14 +195,12 @@ func Vectorize(payload Payload) ([14]float64, error) {
 	}
 
 	// 11: unknown_merchant (1 = unknown, 0 = known)
-	knownSet := make(map[string]struct{}, len(payload.Customer.KnownMerchants))
+	vec[11] = 1
 	for _, m := range payload.Customer.KnownMerchants {
-		knownSet[m] = struct{}{}
-	}
-	if _, ok := knownSet[payload.Merchant.ID]; ok {
-		vec[11] = 0
-	} else {
-		vec[11] = 1
+		if m == payload.Merchant.ID {
+			vec[11] = 0
+			break
+		}
 	}
 
 	// 12: mcc_risk (default 0.5)
