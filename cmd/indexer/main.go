@@ -16,16 +16,16 @@ import (
 )
 
 const (
-	magicBytes          = "RVI1"
-	version             = uint32(1)
-	dimCount            = 14
-	encodingUint8       = uint32(1)
-	defaultPartitions   = 8192
-	coarsePartitions    = 128
-	finePerCoarse       = 64
-	kmeansIterations    = 5
-	convergenceEpsilon  = 1e-6
-	sentinelQuantized   = uint8(255)
+	magicBytes         = "RVI1"
+	version            = uint32(1)
+	dimCount           = 14
+	encodingUint8      = uint32(1)
+	defaultPartitions  = 8192
+	coarsePartitions   = 128
+	finePerCoarse      = 64
+	kmeansIterations   = 5
+	convergenceEpsilon = 1e-6
+	sentinelQuantized  = uint8(255)
 )
 
 func main() {
@@ -479,18 +479,36 @@ func monitorRSS() func() uint64 {
 type bufWriter struct {
 	w   io.Writer
 	buf []byte
+	err error
 }
 
 func newBufWriter(w io.Writer) *bufWriter {
 	const bufSize = 64 * 1024
-	return &bufWriter{w: w, buf: make([]byte, 0, bufSize)}
+	return &bufWriter{
+		w:   w,
+		buf: make([]byte, 0, bufSize),
+		err: nil,
+	}
 }
 
 func (bw *bufWriter) write(p []byte) {
+	if bw.err != nil {
+		return
+	}
 	if len(bw.buf)+len(p) > cap(bw.buf) {
 		bw.flushBuf()
+		if bw.err != nil {
+			return
+		}
 		if len(p) >= cap(bw.buf) {
-			bw.w.Write(p)
+			n, err := bw.w.Write(p)
+			if err != nil {
+				bw.err = err
+				return
+			}
+			if n != len(p) {
+				bw.err = io.ErrShortWrite
+			}
 			return
 		}
 	}
@@ -504,17 +522,27 @@ func (bw *bufWriter) writeUint32(v uint32) {
 }
 
 func (bw *bufWriter) flushBuf() {
-	if len(bw.buf) > 0 {
-		bw.w.Write(bw.buf)
+	if len(bw.buf) > 0 && bw.err == nil {
+		n, err := bw.w.Write(bw.buf)
+		if err != nil {
+			bw.err = err
+			return
+		}
+		if n != len(bw.buf) {
+			bw.err = io.ErrShortWrite
+			return
+		}
 		bw.buf = bw.buf[:0]
 	}
 }
 
 func (bw *bufWriter) flush() error {
 	bw.flushBuf()
+	if bw.err != nil {
+		return bw.err
+	}
 	if f, ok := bw.w.(*os.File); ok {
 		return f.Sync()
 	}
 	return nil
 }
-
