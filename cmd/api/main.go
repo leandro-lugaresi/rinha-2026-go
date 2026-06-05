@@ -4,6 +4,7 @@ import (
 	"log"
 	"net/http"
 	"os"
+	"time"
 
 	"github.com/leandro-lugaresi/rinha-2026-go/internal/api"
 	"github.com/leandro-lugaresi/rinha-2026-go/internal/vectorize"
@@ -43,8 +44,13 @@ func main() {
 	mux.HandleFunc("POST /fraud-score", srv.FraudScoreHandler)
 
 	addr := ":" + port
-	log.Printf("api listening on %s", addr)
-	if err := http.ListenAndServe(addr, mux); err != nil {
+	log.Print("api listening")
+	server := &http.Server{
+		Addr:              addr,
+		Handler:           mux,
+		ReadHeaderTimeout: 5 * time.Second,
+	}
+	if err := server.ListenAndServe(); err != nil {
 		log.Fatalf("server error: %v", err)
 	}
 }

@@ -37,6 +37,7 @@ func NewServer(indexPath string) (*Server, error) {
 	return &Server{
 		searcher: searcher,
 		index:    idx,
+		ready:    false,
 	}, nil
 }
 
@@ -116,8 +117,10 @@ func (s *Server) FraudScoreHandler(w http.ResponseWriter, r *http.Request) {
 // writeDefaultResponse writes the safe-default fraud-score response
 // (approved=true, fraud_score=0.0) to w as JSON.
 func writeDefaultResponse(w http.ResponseWriter) {
-	json.NewEncoder(w).Encode(FraudScoreResponse{
+	if err := json.NewEncoder(w).Encode(FraudScoreResponse{
 		Approved:   true,
 		FraudScore: 0.0,
-	})
+	}); err != nil {
+		log.Printf("error encoding default response: %v", err)
+	}
 }

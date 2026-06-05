@@ -13,7 +13,6 @@ import (
 	"math"
 	"math/rand/v2"
 	"os"
-	"os/exec"
 	"runtime"
 	"sort"
 	"strconv"
@@ -138,8 +137,8 @@ func logf(format string, args ...interface{}) {
 func randomQuery(rng *rand.Rand) [14]float64 {
 	var q [14]float64
 	for i := 0; i < 14; i++ {
-		switch {
-		case i == 5 || i == 6:
+		switch i {
+		case 5, 6:
 			q[i] = rng.Float64()*2 - 1
 		default:
 			q[i] = rng.Float64()
@@ -161,16 +160,19 @@ func genPayloads(n int, rng *rand.Rand) []vectorize.Payload {
 	payloads := make([]vectorize.Payload, n)
 	for i := range payloads {
 		payloads[i] = vectorize.Payload{
+			ID: fmt.Sprintf("bench-%d", i),
 			Transaction: vectorize.Transaction{
 				Amount:       rng.Float64() * 10000,
 				Installments: rng.IntN(24) + 1,
 				RequestedAt:  "2026-01-01T12:00:00Z",
 			},
 			Customer: vectorize.Customer{
-				AvgAmount:  rng.Float64() * 5000,
-				TxCount24h: rng.IntN(50),
+				AvgAmount:      rng.Float64() * 5000,
+				TxCount24h:     rng.IntN(50),
+				KnownMerchants: []string{"MERC-001", "MERC-002"},
 			},
 			Merchant: vectorize.Merchant{
+				ID:        fmt.Sprintf("MERC-%03d", rng.IntN(100)),
 				MCC:       mccs[rng.IntN(len(mccs))],
 				AvgAmount: rng.Float64() * 8000,
 			},
@@ -246,11 +248,8 @@ func printMemoryStats() {
 }
 
 // measureRSS returns the process RSS in kilobytes, or 0 if unavailable.
-// On Linux, it reads /proc/self/status. On macOS/BSDs, it uses ps.
+// On Linux, it reads /proc/self/status.
 func measureRSS() int64 {
-	pid := os.Getpid()
-
-	// Linux: read /proc/self/status
 	if data, err := os.ReadFile("/proc/self/status"); err == nil {
 		for _, line := range strings.Split(string(data), "\n") {
 			if strings.HasPrefix(line, "VmRSS:") {
@@ -262,15 +261,6 @@ func measureRSS() int64 {
 					}
 				}
 			}
-		}
-	}
-
-	// macOS/BSDs: use ps
-	out, err := exec.Command("ps", "-o", "rss=", "-p", strconv.Itoa(pid)).Output()
-	if err == nil {
-		kb, err := strconv.ParseInt(strings.TrimSpace(string(out)), 10, 64)
-		if err == nil {
-			return kb
 		}
 	}
 

@@ -1,6 +1,9 @@
 package scoring
 
-const fraudThreshold = 0.6
+const (
+	fraudThreshold = 0.6
+	fraudLabel     = "fraud"
+)
 
 // ComputeScore computes the fraud score as the fraction of fraud labels
 // among the nearest neighbors, and returns whether the transaction is approved.
@@ -12,7 +15,7 @@ func ComputeScore(nearestLabels []string) (fraudScore float64, approved bool) {
 
 	fraudCount := 0
 	for _, label := range nearestLabels {
-		if label == "fraud" {
+		if label == fraudLabel {
 			fraudCount++
 		}
 	}
