@@ -119,9 +119,9 @@ func (s *IVFSearcher) SearchLabels(query [14]float64, k int) ([]string, error) {
 			vi := vecStart + i
 			vec := s.index.VectorAt(vi)
 			d := dist14Uint8(qUint8, vec)
-			lbl := labelStr(s.index.LabelAt(vi))
 
 			if len(items) < k {
+				lbl := labelStr(s.index.LabelAt(vi))
 				pos := len(items)
 				for pos > 0 && items[pos-1].dist > d {
 					pos--
@@ -130,6 +130,7 @@ func (s *IVFSearcher) SearchLabels(query [14]float64, k int) ([]string, error) {
 				copy(items[pos+1:], items[pos:])
 				items[pos] = cand{dist: d, label: lbl}
 			} else if d < items[len(items)-1].dist {
+				lbl := labelStr(s.index.LabelAt(vi))
 				pos := len(items) - 1
 				for pos > 0 && items[pos-1].dist > d {
 					pos--
@@ -221,12 +222,11 @@ func (s *IVFSearcher) Search(query [14]float64, k int) ([]reference.Reference, e
 			vec := s.index.VectorAt(vi)
 			d := dist14Uint8(qUint8, vec)
 
-			ref := reference.Reference{
-				Vector: dequantizeVector(vec),
-				Label:  labelStr(s.index.LabelAt(vi)),
-			}
-
 			if len(items) < k {
+				ref := reference.Reference{
+					Vector: dequantizeVector(vec),
+					Label:  labelStr(s.index.LabelAt(vi)),
+				}
 				pos := len(items)
 				for pos > 0 && items[pos-1].dist > d {
 					pos--
@@ -235,6 +235,10 @@ func (s *IVFSearcher) Search(query [14]float64, k int) ([]reference.Reference, e
 				copy(items[pos+1:], items[pos:])
 				items[pos] = cand{ref: ref, dist: d}
 			} else if d < items[len(items)-1].dist {
+				ref := reference.Reference{
+					Vector: dequantizeVector(vec),
+					Label:  labelStr(s.index.LabelAt(vi)),
+				}
 				pos := len(items) - 1
 				for pos > 0 && items[pos-1].dist > d {
 					pos--
