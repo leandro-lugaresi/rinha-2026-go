@@ -20,7 +20,7 @@ services:
     environment:
       PORT: "9999"
       GOMAXPROCS: "1"
-      IVF_PROBE_COUNT: "4"
+      IVF_PROBE_COUNT: "8"
       RINHA_INDEX_PATH: /app/references.ivf
       RINHA_NORMALIZATION_PATH: /app/normalization.json
       RINHA_MCC_RISK_PATH: /app/mcc_risk.json
@@ -39,7 +39,7 @@ services:
     environment:
       PORT: "9999"
       GOMAXPROCS: "1"
-      IVF_PROBE_COUNT: "4"
+      IVF_PROBE_COUNT: "8"
       RINHA_INDEX_PATH: /app/references.ivf
       RINHA_NORMALIZATION_PATH: /app/normalization.json
       RINHA_MCC_RISK_PATH: /app/mcc_risk.json
